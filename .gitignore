@@ -1,0 +1,14 @@
+# Ключи подписи и учётные данные — НИКОГДА не коммитить!
+app/keystore/
+*.p12
+*.jks
+*.keystore
+RELEASE_CREDENTIALS*.txt
+
+# Gradle / Android
+app/local.properties
+build/
+.gradle/
+*.iml
+.idea/
+.DS_Store
