@@ -20,7 +20,7 @@ android {
     buildTypes {
         debug {
             isDebuggable = true
-            // signingConfig will be set below after signingConfigs are created
+            // Debug signing is handled automatically by Gradle (no signingConfig needed)
         }
         release {
             isMinifyEnabled = false
@@ -29,7 +29,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // signingConfig will be set below if release keystore exists
+            // Release signing config applied conditionally below
         }
     }
 
@@ -56,15 +56,10 @@ android {
         }
     }
 
-    // Configure signing configs dynamically
+    // Configure release signing config only if keystore exists
     val releaseKeystoreFile = file("keystore/release.p12")
-    val hasReleaseKeystore = releaseKeystoreFile.exists()
-
-    signingConfigs {
-        create("debug") {
-            // Debug signing handled by Gradle automatically
-        }
-        if (hasReleaseKeystore) {
+    if (releaseKeystoreFile.exists()) {
+        signingConfigs {
             create("release") {
                 storeFile = releaseKeystoreFile
                 storeType = "PKCS12"
@@ -73,14 +68,7 @@ android {
                 keyPassword = System.getenv("KEY_PASSWORD") ?: ""
             }
         }
-    }
-
-    // Apply signing configs to build types
-    buildTypes {
-        debug {
-            signingConfig = signingConfigs.getByName("debug")
-        }
-        if (hasReleaseKeystore) {
+        buildTypes {
             release {
                 signingConfig = signingConfigs.getByName("release")
             }
