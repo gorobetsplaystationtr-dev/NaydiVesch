@@ -3,12 +3,20 @@ package com.example.naydivesch
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.Column
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -55,13 +63,13 @@ fun NaydiVeschApp() {
     Surface {
         Column(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = androidx.compose.foundation.layout.Arrangement.Top
+            verticalArrangement = Arrangement.Top
         ) {
             TopAppBar(
                 title = { Text(text = "НайдиВещь", fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = androidx.compose.material3.MaterialTheme.colorScheme.onPrimaryContainer
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             )
 
@@ -85,11 +93,11 @@ fun NaydiVeschApp() {
                                 restoreState = true
                             }
                         },
-                        colors = androidx.compose.material3.NavigationBarDefaults.navigationBarItemColors(
-                            selectedIconColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
-                            selectedTextColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
-                            unselectedIconColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
-                            unselectedTextColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                 }
@@ -111,16 +119,16 @@ data class TabItem(val label: String, val route: String, val index: Int) {
 fun HomeScreen(onNavigateToSearch: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 4.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
-                verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(text = "Добро пожаловать в НайдиВещь!", fontSize = 24.sp, fontWeight = FontWeight.Bold)
                 Text(text = "Приложение помогает находить потерянные вещи. Выберите действие ниже:", fontSize = 16.sp)
@@ -128,9 +136,9 @@ fun HomeScreen(onNavigateToSearch: () -> Unit) {
                 Button(
                     onClick = onNavigateToSearch,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
-                        contentColor = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
                     Text(text = "Начать поиск", fontSize = 18.sp, fontWeight = FontWeight.Medium)
@@ -144,15 +152,15 @@ fun HomeScreen(onNavigateToSearch: () -> Unit) {
 fun SearchScreen() {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 4.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                 Text(text = "Поиск вещи", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                Text(text = "Здесь будет функционал поиска (NFC, QR, голос)", fontSize = 16.sp, color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = "Здесь будет функционал поиска (NFC, QR, голос)", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
@@ -162,15 +170,15 @@ fun SearchScreen() {
 fun SettingsScreen() {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 4.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                 Text(text = "Настройки", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                Text(text = "Настройки приложения", fontSize = 16.sp, color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = "Настройки приложения", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
