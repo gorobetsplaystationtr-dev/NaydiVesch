@@ -29,7 +29,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            // signingConfig will be set dynamically if release keystore exists
         }
     }
 
@@ -56,16 +56,35 @@ android {
         }
     }
 
-    signingConfigs {
-        create("debug") {
-            // Debug signing handled by Gradle automatically
+    // Configure signing configs dynamically
+    val releaseKeystoreFile = file("keystore/release.p12")
+    if (releaseKeystoreFile.exists()) {
+        signingConfigs {
+            create("debug") {
+                // Debug signing handled by Gradle automatically
+            }
+            create("release") {
+                storeFile = releaseKeystoreFile
+                storeType = "PKCS12"
+                keyAlias = "naydivesch"
+                // Passwords set via environment variables in CI
+                storePassword = System.getenv("STORE_PASSWORD") ?: ""
+                keyPassword = System.getenv("KEY_PASSWORD") ?: ""
+            }
         }
-        create("release") {
-            // Will be configured in CI from secrets
-            storeFile = file("keystore/release.p12")
-            storeType = "PKCS12"
-            keyAlias = "naydivesch"
-            // Passwords set via environment variables in CI
+        
+        // Apply release signing config to release build type
+        buildTypes {
+            release {
+                signingConfig = signingConfigs.getByName("release")
+            }
+        }
+    } else {
+        // Only debug signing config when no release keystore
+        signingConfigs {
+            create("debug") {
+                // Debug signing handled by Gradle automatically
+            }
         }
     }
 }
