@@ -20,7 +20,7 @@ android {
     buildTypes {
         debug {
             isDebuggable = true
-            signingConfig = signingConfigs.getByName("debug")
+            // signingConfig will be set below after signingConfigs are created
         }
         release {
             isMinifyEnabled = false
@@ -29,7 +29,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // signingConfig will be set dynamically if release keystore exists
+            // signingConfig will be set below if release keystore exists
         }
     }
 
@@ -58,32 +58,31 @@ android {
 
     // Configure signing configs dynamically
     val releaseKeystoreFile = file("keystore/release.p12")
-    if (releaseKeystoreFile.exists()) {
-        signingConfigs {
-            create("debug") {
-                // Debug signing handled by Gradle automatically
-            }
+    val hasReleaseKeystore = releaseKeystoreFile.exists()
+
+    signingConfigs {
+        create("debug") {
+            // Debug signing handled by Gradle automatically
+        }
+        if (hasReleaseKeystore) {
             create("release") {
                 storeFile = releaseKeystoreFile
                 storeType = "PKCS12"
                 keyAlias = "naydivesch"
-                // Passwords set via environment variables in CI
                 storePassword = System.getenv("STORE_PASSWORD") ?: ""
                 keyPassword = System.getenv("KEY_PASSWORD") ?: ""
             }
         }
-        
-        // Apply release signing config to release build type
-        buildTypes {
+    }
+
+    // Apply signing configs to build types
+    buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
+        }
+        if (hasReleaseKeystore) {
             release {
                 signingConfig = signingConfigs.getByName("release")
-            }
-        }
-    } else {
-        // Only debug signing config when no release keystore
-        signingConfigs {
-            create("debug") {
-                // Debug signing handled by Gradle automatically
             }
         }
     }
