@@ -88,7 +88,7 @@ fun NaydiVeschApp() {
                         onClick = { 
                             selectedTab.value = tab.index
                             navController.navigate(tab.route) { 
-                                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                popUpTo(navController.graph.startDestinationId) { saveState = true }
                                 launchSingleTop = true
                                 restoreState = true
                             }
