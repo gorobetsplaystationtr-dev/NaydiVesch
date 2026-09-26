@@ -43,6 +43,8 @@ jobs:
       - name: Calculate versionCode (commits in main)
         id: version
         run: |
+          # Ensure main branch is available (checkout with fetch-depth: 0 may not create local main ref on tag push)
+          git fetch origin main:main 2>/dev/null || git fetch origin refs/heads/main:refs/remotes/origin/main
           COMMIT_COUNT=$(git rev-list --count main)
           echo "commit_count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
           
