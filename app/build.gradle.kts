@@ -56,6 +56,25 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1,LICENSE,LICENSE.txt,NOTICE,NOTICE.txt}"
         }
     }
+
+    // Configure release signing config if keystore exists
+    val releaseKeystoreFile = File(rootProject.rootDir, "app/keystore/release.p12")
+    if (releaseKeystoreFile.exists()) {
+        signingConfigs {
+            create("release") {
+                storeFile = releaseKeystoreFile
+                storeType = "PKCS12"
+                keyAlias = "naydivesch"
+                storePassword = System.getenv("STORE_PASSWORD") ?: ""
+                keyPassword = System.getenv("KEY_PASSWORD") ?: ""
+            }
+        }
+        buildTypes {
+            release {
+                signingConfig = signingConfigs.getByName("release")
+            }
+        }
+    }
 }
 
 dependencies {
