@@ -58,7 +58,7 @@ android {
     }
 
     // Configure release signing config only if keystore exists
-    val releaseKeystoreFile = File(project.rootDir, "app/keystore/release.p12")
+    val releaseKeystoreFile = File(rootProject.rootDir, "app/keystore/release.p12")
     if (releaseKeystoreFile.exists()) {
         signingConfigs {
             create("release") {
