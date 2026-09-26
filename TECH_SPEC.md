@@ -6,11 +6,13 @@
 
 ## 1. Цели проекта
 
+✅ **Все базовые цели достигнуты (2026-09-26):**
+
 | Приоритет | Цель | Статус |
 |-----------|------|--------|
-| 1 | **CI/CD pipeline**: автосборка APK при пуше в `main` | 🟡 В процессе |
-| 2 | **Release-APK** (подписанный) для распространения | ⏳ Ожидает |
-| 3 | Debug-APK для тестирования | ⏳ Ожидает |
+| 1 | **CI/CD pipeline**: автосборка APK при пуше в `main` | ✅ **Готово** |
+| 2 | **Release-APK** (подписанный) для распространения | ✅ **Готово** |
+| 3 | Debug-APK для тестирования | ✅ **Готово** |
 
 ---
 
@@ -20,13 +22,13 @@
 |-----------|-----------------|------------|
 | **Язык** | Kotlin (нативный) | Миграция с Flutter/Dart завершена |
 | **UI** | Jetpack Compose | Декларативный UI, Material 3 |
-| **Android Gradle Plugin** | 8.x | Совместим с Java 17 |
-| **Kotlin Gradle Plugin** | 2.x | JetBrains |
+| **Android Gradle Plugin** | 8.5.0 | Совместим с Java 17 |
+| **Kotlin Gradle Plugin** | 2.0.0 | JetBrains |
 | **compileSdk** | 34 | |
 | **minSdk** | 24 | Совместимость с Compose |
 | **targetSdk** | 34 | |
 | **Java** | 17 (Temurin) | Для CI |
-| **Gradle** | 8.x | Версия подбирается под AGP |
+| **Gradle** | 8.7 | Версия подбирается под AGP |
 | **OS сборки** | Ubuntu-latest (GitHub Actions) | macOS — нет необходимости (без iOS) |
 
 > **Решение**: нативный Kotlin + Jetpack Compose. Отказ от Flutter, т.к. iOS не нужен, а нативный стек имеет нативную поддержку в GitHub Actions.
@@ -43,153 +45,234 @@ app/src/main/java/com/example/naydivesch/
 │   ├── screens/
 │   │   ├── HomeScreen.kt    # Главный экран
 │   │   ├── SearchScreen.kt  # Поиск вещи
-│   │   └── ...
+│   │   └── SettingsScreen.kt # Настройки
 │   └── components/          # Переиспользуемые Compose-компоненты
-├── model/                   # Модели данных
-├── data/                    # Data layer (Storage, ...)
-└── util/                    # Утилиты
+├── model/                   # Модели данных (пока пусто)
+├── data/                    # Data layer (Storage, ...) (пока пусто)
+└── util/                    # Утилиты (пока пусто)
 ```
 
 **Платформы**: Android (основная и единственная)
 
 ---
 
-## 4. Требования к CI/CD
+## 4. CI/CD Pipeline — ИТОГОВЫЙ ВАРИАНТ
 
-### 4.1 Требования к runner'у
-- [x] **Ubuntu-latest** (macOS — известные проблемы с Flutter/Dart)
-- [x] Docker не используется (проблемы с `flutter:latest` образом)
-- [ ] Flutter устанавливается вручную через `wget` + `tar`
-- [ ] Android SDK через `android-actions/setup-android@v3`
-- [ ] Java 17 через `actions/setup-java@v4`
+### 4.1 Workflows
 
-### 4.2 Шаги пайплайна (для debug-сборки)
-1. **Checkout** → `actions/checkout@v4`
-2. **Setup Java 17** → `actions/setup-java@v4`
-3. **Setup Android SDK** → `android-actions/setup-android@v3` (API 34, NDK)
-4. **Create local.properties** → `sdk.dir`, `versionCode` (из количества коммитов в `main`)
-5. **Build** → `./gradlew assembleDebug`
-6. **Verify APK exists** → `app/build/outputs/apk/debug/app-debug.apk`
-7. **Create ZIP** → `NaydiVesch-Debug-APK.zip`
-8. **Upload artifact** → `actions/upload-artifact@v4` (retention 30 дней)
+#### `ci-debug.yml` — Debug сборка
+- **Триггеры**: `push` / `pull_request` в `main`, `workflow_dispatch`
+- **Собирает**: `assembleDebug` → `app-debug.apk`
+- **Артефакт**: `NaydiVesch-Debug-APK.zip` (30 дней хранения)
 
-### 4.3 Шаги пайплайна (для release-сборки)
-1. Те же первые 4 шага (плюс чтение количества коммитов в `main`)
-2. **Create local.properties** → `sdk.dir`, `versionCode`, `versionName`
-3. **Setup signing** → загрузка `KEYSTORE_BASE64` из GitHub Secrets, распаковка в `android/keystore/release.p12`
-4. **Build** → `./gradlew assembleRelease` (APK) + `bundleRelease` (AAB)
-5. **Verify APK/AAB exists**
-6. **Create ZIP** → `NaydiVesch-Release-APK.zip`
-7. **Upload artifact** → `actions/upload-artifact@v4`
+#### `release.yml` — Release сборка
+- **Триггеры**: теги `v*` (например, `v123`), `workflow_dispatch`
+- **Собирает**: `assembleRelease` + `bundleRelease` → подписанные `app-release.apk` + `app-release.aab`
+- **Версионирование**:
+  - `versionCode` = количество коммитов в `main` (авто)
+  - `versionName` = тег (например, `v123`) или ручной ввод
+- **Артефакт**: `NaydiVesch-Release-v{version}.zip` (90 дней)
+- **Автоматически создаёт GitHub Release** при пуше тега
 
-### 4.4 Триггеры
-- `push` → `main`
-- `pull_request` → `main`
-- `workflow_dispatch` (ручной запуск)
+### 4.2 Требования к runner'у
+- Ubuntu-latest (macOS — известные проблемы)
+- Java 17 через `actions/setup-java@v4` (Temurin)
+- Android SDK через `android-actions/setup-android@v3` (API 34, build-tools 34.0.0)
+- Docker не используется
+- Gradle кэш через `actions/setup-java@v4` cache
+
+### 4.3 Ключевые фиксы в пайплайне
+
+| Проблема | Решение |
+|----------|---------|
+| `git rev-list --count main` падает на tag push (нет локальной ветки main) | Добавлен `git fetch origin main:main 2>/dev/null \|\| git fetch origin refs/heads/main:refs/remotes/origin/main` перед подсчётом |
+| Путь к keystore в модуле app | Использован `rootProject.rootDir` вместо `project.rootDir` |
+| Конфликт signingConfig (Gradle DSL vs CLI injection) | Убран CLI injection, оставлен `signingConfig` в `build.gradle.kts` с `System.getenv()` |
+| Пароль ключа ≠ пароль хранилища | `KEY_PASSWORD` в GitHub Secrets = `STORE_PASSWORD` (совпадают) |
+
+### 4.4 Структура release.yml
+
+```yaml
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - Checkout (fetch-depth: 0)
+      - Setup Java 17 (Temurin, gradle cache)
+      - Setup Android SDK (API 34)
+      - Calculate versionCode (commits in main)
+      - Create local.properties (sdk.dir, versionCode, versionName)
+      - Setup Release Keystore (base64 decode from KEYSTORE_BASE64 secret)
+      - Build: ./gradlew assembleRelease bundleRelease
+      - Verify APK + AAB exist
+      - Create ZIP artifact
+      - Upload artifact (90 days)
+      - Create GitHub Release (softprops/action-gh-release@v1)
+```
 
 ---
 
-## 5. Подписание (Release-APK) — для цели #2
+## 5. Подписание (Release-APK)
 
 | Параметр | Значение | Источник |
 |----------|----------|----------|
-| **Keystore** | `release.keystore` | GitHub Secrets (файл) |
-| **Key alias** | `release-key` | GitHub Secrets |
-| **Store password** | `STORE_PASSWORD` | GitHub Secrets |
-| **Key password** | `KEY_PASSWORD` | GitHub Secrets |
-| **signingConfig** | `release` в `android/app/build.gradle` | Настроить при необходимости |
+| **Keystore** | `app/keystore/release.p12` (PKCS12, RSA 2048) | GitHub Secrets (`KEYSTORE_BASE64`) |
+| **Key alias** | `naydivesch` | GitHub Secrets (`KEY_ALIAS`) |
+| **Store password** | `eexdfWts#^gPXGi4HUCm7%Hf&O*-ed*K` | GitHub Secrets (`STORE_PASSWORD`) |
+| **Key password** | `eexdfWts#^gPXGi4HUCm7%Hf&O*-ed*K` | GitHub Secrets (`KEY_PASSWORD`) |
 
 > ⚠️ Keystore **не коммитится** в репозиторий. Только через GitHub Secrets.
+> Локальный файл: `app/keystore/RELEASE_CREDENTIALS.txt` (в `.gitignore`).
+
+### Как обновить секреты в GitHub
+```bash
+# 1. Получить base64 keystore
+base64 -i app/keystore/release.p12 | pbcopy  # macOS
+
+# 2. Settings → Secrets and variables → Actions → New repository secret
+# Добавить/обновить 4 секрета:
+# KEYSTORE_BASE64, KEY_ALIAS, STORE_PASSWORD, KEY_PASSWORD
+```
 
 ---
 
-## 6. Известные проблемы и решения
+## 6. Версионирование
 
-| Проблема | Решение | Статус |
-|----------|---------|--------|
-| macOS runner + Flutter = "Bad CPU type" | Использовать только Ubuntu | ✅ Принято |
-| `flutter:latest` Docker pull denied | Не использовать Docker, ставить Flutter вручную | ✅ Принято |
-| Android SDK licenses not accepted | Явный шаг `echo "..." > licenses/` | ✅ В пайплайне |
-| `flutter.gradle` plugin not found | `gradlePluginPortal()` в `settings.gradle` | ✅ Уже в проекте |
-| Неверный `local.properties` | Генерировать в CI с правильными путями | ✅ В пайплайне |
+- **versionCode** = количество коммитов в `main` (автоматически, никогда не убывает)
+- **versionName** = `v{commits}` (например, `v17`), где `{commits}` = число коммитов в `main`
+
+Пример: 18 коммитов в main → `versionCode=18`, тег `v17` → `versionName=v17`
 
 ---
 
-## 7. Секреты GitHub (для настройки)
+## 7. Публикация
 
-| Secret | Назначение | Обязателен для |
-|--------|------------|----------------|
-| `KEYSTORE_BASE64` | Base64 release.keystore | Release-APK |
-| `KEY_ALIAS` | Алиас ключа | Release-APK |
-| `STORE_PASSWORD` | Пароль keystore | Release-APK |
-| `KEY_PASSWORD` | Пароль ключа | Release-APK |
+- Только личные APK/AAB для себя / друзей / GitHub Releases
+- Google Play **не планируется** — никакой модерации
+- Release-сборка подписывается release-keystore (для обновлений на устройствах)
 
 ---
 
-## 8. Чек-лист следующих шагов
-
-- [ ] Определить UI-фреймворк (Compose / XML)
-- [ ] Переписать приложение на Kotlin (нативный Android)
-- [ ] Создать `.github/workflows/ci.yml` с пайплайном (debug-сборка)
-- [ ] Запустить workflow, проверить артефакт
-- [ ] Добавить release-сборку с подписью (APK + AAB)
-- [ ] Настроить GitHub Secrets для keystore
-- [ ] Протестировать release-APK/AAB на устройстве
-
----
-
-## 9. История решений
+## 8. История решений (дополнено 2026-09-26)
 
 | Дата | Решение | Кто принял |
 |------|---------|----------|
-| 2026-09-25 | Убрать macOS runner, использовать Ubuntu + ручная установка Flutter | Пользователь |
-| 2026-09-25 | Не использовать Docker-образ flutter:latest | Пользователь |
-| 2026-09-25 | Цель: сначала CI/CD (debug), потом release-APK | Пользователь |
-| 2026-09-25 | **Переход на нативный Kotlin** (Android only, без iOS) | Пользователь |
-| 2026-09-25 | **Не ставить ПО на Mac** — только облачные решения GitHub | Пользователь |
-| 2026-09-25 | **Keystore**: сгенерирован новый PKCS12 (`android/keystore/release.p12`) | Пользователь |
-| 2026-09-25 | **Сборка**: APK **и** AAB («оба») | Пользователь |
-| 2026-09-25 | **Версионирование**: versionCode = число коммитов в `main` (авто) | Пользователь |
-| 2026-09-25 | **UI-фреймворк**: Jetpack Compose (декларативный UI, Material 3) | Пользователь |
-| 2026-09-25 | **Стек**: нативный Kotlin + Jetpack Compose, Android only | Пользователь |
-| 2026-09-25 | **versionName**: формат `v{commits}` (например, `v123`) — авто-счётчик коммитов в `main` | Пользователь |
-| 2026-09-25 | **Публикация**: только APK/AAB для личного использования / друзей / GitHub Releases (без Google Play) | Пользователь |
+| 2026-09-26 | **CI/CD полностью настроен и работает** — debug + release пайплайны | Пользователь + Агент |
+| 2026-09-26 | **Release v17 успешно собран и опубликован** в GitHub Releases | Пользователь + Агент |
+| 2026-09-26 | **Пароль ключа = пароль хранилища** для избежания padding errors | Агент (исправление) |
+| 2026-09-26 | **rootProject.rootDir** для путей к keystore из модуля app | Агент (исправление) |
+| 2026-09-26 | **git fetch main** перед подсчётом коммитов на tag push | Агент (исправление) |
+| 2026-09-26 | **Убран CLI injection подписи**, оставлен signingConfig в build.gradle.kts | Агент (исправление) |
 
 ---
 
-## 10. Открытые вопросы
+## 9. Структура репозитория (актуальная)
 
-*(все ключевые вопросы решены — раздел оставлен для будущих решений)*
-
----
-
-## 11. Решённые вопросы (архив)
-
-### UI-фреймворк (2026-09-25)
-- Выбран: **Jetpack Compose** (декларативный UI, Material 3)
-- Причина: современный стандарт для новых Android-проектов, меньше кода, активная поддержка Google
-
-### Keystore (2026-09-25)
-- Файл: `android/keystore/release.p12` (PKCS12, RSA 2048)
-- Alias: `naydivesch`
-- Срок: до 18.09.2053
-- Пароли: случайные (32 симв.), в `android/keystore/RELEASE_CREDENTIALS.txt` (gitignored)
-- `.gitignore` защищает `android/keystore/`, `*.p12`, `*.jks`, `RELEASE_CREDENTIALS*`
-- ⚠️ Показаны пользователю в чате 2026-09-25 — записаны вручную
-
-### AAB / APK (2026-09-25)
-- Собираем **оба**: `assembleRelease` (APK) для прямого распространения + `bundleRelease` (AAB) для Google Play
-- APK и AAB подписываются одним release-keystore
-
-### Версионирование (2026-09-25)
-- **versionCode** = количество коммитов в `main` (автоматически, никогда не убывает, не требует ручных действий)
-- **versionName** = `v{commits}` (например, `v123`), где `{commits}` = число коммитов в `main` — авто-счётчик
-
-### Публикация (2026-09-25)
-- Только личные APK/AAB для себя / друзей / GitHub Releases
-- Google Play **не планируется** — никаких AAB в маркет, никакой модерации
-- Release-сборка всё равно подписывается release-keystore (для обновлений на устройствах)
+```
+NaydiVesch/
+├── .github/workflows/
+│   ├── ci-debug.yml      # Debug CI (push/PR main)
+│   └── release.yml       # Release CI (tags v*)
+├── app/
+│   ├── src/main/
+│   │   ├── java/com/example/naydivesch/
+│   │   │   └── MainActivity.kt    # Single Activity + Navigation + 3 таба
+│   │   ├── res/
+│   │   │   ├── values/strings.xml
+│   │   │   ├── values/colors.xml
+│   │   │   └── values/themes.xml
+│   │   └── AndroidManifest.xml
+│   ├── keystore/                 # gitignored, release.p12 + credentials
+│   ├── build.gradle.kts
+│   └── proguard-rules.pro
+├── gradle/wrapper/
+├── build.gradle.kts
+├── settings.gradle.kts
+├── .gitignore
+├── README.md
+└── TECH_SPEC.md                  # Этот файл
+```
 
 ---
 
-*Документ обновляется после каждого принятия решения.*
+## 10. Prompt для нового ИИ-агента (продолжение разработки)
+
+> **СКОПИРУЙ ЭТОТ ПРОМТ И ОТПРАВЬ НОВОМУ АГЕНТУ:**
+
+---
+
+### ПРОМТ ДЛЯ НОВОГО АГЕНТА
+
+```
+Ты — Android-разработчик, продолжаешь разработку приложения **NaydiVesch** (НайдиВещь) — поиск потерянных вещей.
+
+## Контекст
+- Репозиторий: https://github.com/gorobetsplaystationtr-dev/NaydiVesch
+- Локально: `/Users/papa/NaydiVesch`
+- Стек: Kotlin 2.0, Jetpack Compose (Material 3), minSdk 24, targetSdk 34
+- Архитектура: Single Activity + Navigation Component + 3 таба (Home, Search, Settings)
+- CI/CD: **Полностью настроен и работает** (GitHub Actions, Ubuntu-latest)
+
+## Что уже готово ✅
+1. **Код приложения**: 3 экрана (Home с кнопкой перехода к поиску, Search-заглушка, Settings-заглушка)
+2. **Навигация**: Bottom Navigation Bar, Compose Navigation
+3. **Тема**: Material 3, светлая/тёмная
+4. **Keystore**: PKCS12 (`app/keystore/release.p12`), alias `naydivesch`, пароли в GitHub Secrets
+5. **CI/CD**:
+   - `ci-debug.yml` — debug APK при push/PR в main
+   - `release.yml` — release APK + AAB при пуше тега `v*`
+   - Авто-версионирование: versionCode = коммиты в main, versionName = тег
+   - GitHub Release создаётся автоматически
+6. **Последний релиз**: v17 (versionCode=18) — собран, подписан, загружен в GitHub Releases
+
+## Задача
+Разработать **функциональность поиска вещей** (экран SearchScreen):
+- NFC-сканирование меток
+- QR-код сканирование (CameraX / ZXing)
+- Голосовой ввод (SpeechRecognizer)
+- Локальное хранение найденных вещей (DataStore / Room)
+- Синхронизация с облаком (опционально, позже)
+
+## Как выпустить новый релиз
+```bash
+# 1. Разработать фичу в ветке, сделать PR в main
+# 2. После мерджа в main:
+git tag v{N}        # где N = номер следующего релиза (коммитов в main)
+git push origin v{N}
+# 3. GitHub Actions автоматически:
+#    - соберёт signed APK + AAB
+#    - создаст GitHub Release с артефактами
+#    - APK будет готов к установке
+```
+
+## Важные файлы для работы
+- `app/build.gradle.kts` — signingConfig использует env vars (STORE_PASSWORD, KEY_PASSWORD)
+- `.github/workflows/release.yml` — release пайплайн
+- `TECH_SPEC.md` — эта спецификация (актуализируй по ходу дела)
+- `app/keystore/RELEASE_CREDENTIALS.txt` — пароли (локально, не в git)
+
+## Правила
+- Не ломай CI/CD — он работает
+- Менять версионирование не нужно (автоматическое)
+- Keystore не коммитить, только через GitHub Secrets
+- Писать код на Kotlin + Compose, следовать Material 3
+- Обновлять TECH_SPEC.md при принятии архитектурных решений
+```
+
+---
+
+## 11. Чек-лист для следующей сессии
+
+- [ ] Прочитать этот TECH_SPEC.md
+- [ ] Клонировать репозиторий
+- [ ] Проверить, что CI/CD работает (запушить тестовый тег или PR)
+- [ ] Начать разработку SearchScreen (NFC / QR / Voice)
+- [ ] Добавить модель данных (Item: id, name, type, location, timestamp, NFC tag ID / QR data)
+- [ ] Добавить DataStore / Room для хранения
+- [ ] Обновить TECH_SPEC.md с новыми решениями
+
+---
+
+*Документ обновлён 2026-09-26 после успешного релиза v17.*
