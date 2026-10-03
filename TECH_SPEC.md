@@ -265,13 +265,23 @@ git push origin v{N}
 
 ## 11. Чек-лист для следующей сессии
 
-- [ ] Прочитать этот TECH_SPEC.md
-- [ ] Клонировать репозиторий
-- [ ] Проверить, что CI/CD работает (запушить тестовый тег или PR)
-- [ ] Начать разработку SearchScreen (NFC / QR / Voice)
-- [ ] Добавить модель данных (Item: id, name, type, location, timestamp, NFC tag ID / QR data)
-- [ ] Добавить DataStore / Room для хранения
-- [ ] Обновить TECH_SPEC.md с новыми решениями
+- [x] Прочитать этот TECH_SPEC.md
+- [x] Клонировать репозиторий
+- [x] Проверить, что CI/CD работает (запушить тестовый тег или PR)
+- [x] **Добавлены Compose UI экраны (v18):**
+  - [x] ThingsScreen — карточки вещей с фото-плейсхолдером, статус-чипами, поиском, FAB
+  - [x] LocationsScreen — карточки мест с QR/NFC бейджами, поиском, FAB
+  - [x] LinkScreen — ExposedDropdownMenu для выбора вещи/места, тип связи (radiobuttons), заметки
+  - [x] 19+ Composable-компонентов в Screens.kt
+  - [x] Material 3 тема (цвета, типографика)
+  - [x] 5 табов в Bottom Navigation (Главная, Вещи, Поиск, Связи, Настройки)
+  - [x] Dialog формы для добавления/редактирования вещей и мест
+  - [x] ConfirmDeleteDialog
+  - [x] EmptyState для пустых списков
+  - [x] Подписанный APK генерируется через GitHub Actions (тег v18)
+
+- [ ] При необходимости: реализовать NFC-сканирование и QR-код сканирование в LocationForm
+- [ ] При необходимости: добавить CameraX для QR-сканирования
 
 ---
 
