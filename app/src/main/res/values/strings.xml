@@ -3,4 +3,57 @@
     <string name="home_title">Главный экран</string>
     <string name="search_title">Поиск вещи</string>
     <string name="settings_title">Настройки</string>
+
+    <!-- Things Screen -->
+    <string name="things_title">Мои вещи</string>
+    <string name="things_empty">У вас пока нет вещей</string>
+    <string name="things_add_thing">Добавить вещь</string>
+    <string name="things_edit">Редактировать</string>
+    <string name="things_delete">Удалить</string>
+    <string name="things_search_hint">Поиск вещей…</string>
+    <string name="thing_name_hint">Название вещи</string>
+    <string name="thing_description_hint">Описание (необязательно)</string>
+    <string name="thing_category_hint">Категория</string>
+    <string name="thing_status_active">Активна</string>
+    <string name="thing_status_lost">Потеряна</string>
+    <string name="thing_status_found">Найдена</string>
+    <string name="thing_save">Сохранить</string>
+    <string name="thing_cancel">Отмена</string>
+    <string name="thing_added">Вещь добавлена</string>
+    <string name="thing_updated">Вещь обновлена</string>
+    <string name="thing_deleted">Вещь удалена</string>
+    <string name="thing_confirm_delete">Удалить эту вещь?</string>
+    <string name="thing_yes">Да</string>
+    <string name="photo_placeholder">Нет фото</string>
+    <string name="take_photo">Сфотографировать</string>
+    <string name="choose_from_gallery">Из галереи</string>
+
+    <!-- Locations Screen -->
+    <string name="locations_title">Мои места</string>
+    <string name="locations_empty">У вас пока нет мест</string>
+    <string name="locations_add_location">Добавить место</string>
+    <string name="location_name_hint">Название места</string>
+    <string name="location_address_hint">Адрес (необязательно)</string>
+    <string name="location_nfc_instructions">Отсканируйте NFC-метку для привязки места</string>
+    <string name="location_qr_instructions">Отсканируйте QR-код для привязки места</string>
+    <string name="location_nfc_scanned">NFC метка сканирована</string>
+    <string name="location_qr_scanned">QR-код успешно отсканирован</string>
+    <string name="location_scan_error">Ошибка сканирования</string>
+    <string name="location_nfc_tag_id">ID метки: %1$s</string>
+    <string name="location_added">Место добавлено</string>
+    <string name="location_scan_fail">Не удалось отсканировать. Проверьте NFC/камеру.</string>
+
+    <!-- Link Screen -->
+    <string name="link_title">Связать вещь и место</string>
+    <string name="link_select_thing">Выберите вещь</string>
+    <string name="link_select_location">Выберите место</string>
+    <string name="link_thing_placeholder">Вещь не выбрана</string>
+    <string name="link_location_placeholder">Место не выбрано</string>
+    <string name="link_save">Сохранить связь</string>
+    <string name="link_already_exists">Эта связь уже существует</string>
+    <string name="link_created">Связь создана</string>
+    <string name="link_notes_hint">Примечание (необязательно)</string>
+    <string name="link_type_current">Текущее местоположение</string>
+    <string name="link_type_stored">Хранится здесь</string>
+    <string name="link_type_lost_at">Потеряна здесь</string>
 </resources>

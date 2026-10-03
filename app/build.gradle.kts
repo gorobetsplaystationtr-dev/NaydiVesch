@@ -79,6 +79,9 @@ android {
 }
 
 dependencies {
+    // Material Icons Extended for Compose UI
+    implementation("androidx.compose.material:material-icons-extended:1.7.0")
+
     // Core Android / Compose
     implementation(platform("androidx.compose:compose-bom:2024.08.00"))
     implementation("androidx.activity:activity-compose:1.9.2")
@@ -95,23 +98,27 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 
-    // Data / Storage
-    implementation("androidx.datastore:datastore-preferences:1.1.2")
-    implementation("androidx.room:room-runtime:2.6.1")
-    kapt("androidx.room:room-compiler:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-
-    // Network
+    // Network - Retrofit & OkHttp
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
-    // Lifecycle
+    // Room Database
+    val room_version = "2.6.1"
+    implementation("androidx.room:room-runtime:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
+    kapt("androidx.room:room-compiler:$room_version")
+
+    // Data / Storage
+    implementation("androidx.datastore:datastore-preferences:1.1.2")
+    implementation("androidx.datastore:datastore-core:1.1.2")
+
+    // Lifecycle & ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.0")
-
-    // Icons
-    implementation("androidx.compose.material:material-icons-extended:1.7.0")
 
     // Testing
     testImplementation("junit:junit:4.13.2")
