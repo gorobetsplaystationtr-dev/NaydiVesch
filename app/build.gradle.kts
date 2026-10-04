@@ -3,7 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("kotlin-android")
-    id("kotlin-kapt")
+    id("com.google.devtools.ksp") version "2.0.0-1.0.13"
 }
 
 android {
@@ -40,14 +40,6 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
-        freeCompilerArgs += listOf("-Xallow-kapt-language-version-2.0")
-    }
-
-    kapt {
-        correctErrorTypes = true
-        arguments {
-            arg("room.incremental", "false")
-        }
     }
 
     buildFeatures {
@@ -115,7 +107,7 @@ dependencies {
     val room_version = "2.7.0-alpha02"
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
-    kapt("androidx.room:room-compiler:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
 
     // Data / Storage
     implementation("androidx.datastore:datastore-preferences:1.1.2")
