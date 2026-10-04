@@ -2,6 +2,7 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        gradlePluginPortal()
     }
     dependencies {
         classpath("com.android.tools.build:gradle:8.5.0")
@@ -12,7 +13,7 @@ buildscript {
 plugins {
     id("com.android.application") version "8.5.0" apply false
     id("org.jetbrains.kotlin.android") version "1.9.24" apply false
-    id("org.jetbrains.kotlin.plugin.compose") version "1.5.6" apply false
+    id("org.jetbrains.kotlin.plugin.compose") apply false
 }
 
 allprojects {
