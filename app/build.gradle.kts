@@ -47,7 +47,8 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "2.0.0"
+        // Kotlin 2.0.0: Compose Compiler is bundled with the Kotlin Gradle plugin
+        // Remove kotlinCompilerExtensionVersion as it's deprecated
     }
 
     packagingOptions {
