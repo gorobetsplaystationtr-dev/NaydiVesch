@@ -118,8 +118,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
     implementation("androidx.navigation:navigation-compose:2.8.3")
 
-    // Room Database - Room 2.6.1 with kapt for K2 support
-    val room_version = "2.6.1"
+    // Room Database - Room 2.7.0 with kapt for K2 support
+    val room_version = "2.7.0"
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
