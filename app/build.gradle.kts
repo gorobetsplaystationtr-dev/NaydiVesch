@@ -42,6 +42,11 @@ android {
         jvmTarget = "17"
     }
 
+    kapt {
+        incremental = false
+        correctErrorTypes = true
+    }
+
     buildFeatures {
         compose = true
     }
