@@ -24,8 +24,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3material3
+import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -133,7 +134,7 @@ private fun AddLocationDialog(
     var nfcUid by rememberSaveable { mutableStateOf("") }
     var qrCodeUrl by rememberSaveable { mutableStateOf("") }
 
-    androidx.compose.material3 AlertDialog(
+    AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Новое место хранения") },
         text = {
