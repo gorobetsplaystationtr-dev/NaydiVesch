@@ -8,7 +8,6 @@ import androidx.room.Update
 import com.example.naydivesch.model.Location
 import com.example.naydivesch.model.Thing
 import com.example.naydivesch.model.ThingLocationLink
-import java.util.Date
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -42,8 +41,8 @@ interface ThingLocationLinkDao {
     suspend fun deactivate(thingId: Long, locationId: Long)
 
     @Query("SELECT * FROM thing_location_links WHERE linkedAt > :since ORDER BY linkedAt ASC")
-    suspend fun getModifiedSince(since: Date): List<ThingLocationLink>
+    suspend fun getModifiedSince(since: Long): List<ThingLocationLink>
 
     @Query("SELECT MAX(linkedAt) FROM thing_location_links")
-    suspend fun getMaxUpdatedAt(): Date?
+    suspend fun getMaxUpdatedAt(): Long?
 }

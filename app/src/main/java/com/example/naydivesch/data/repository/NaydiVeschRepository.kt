@@ -15,7 +15,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import java.util.Date
 
 class NaydiVeschRepository private constructor(
     private val api: NaydiVeschApi,
@@ -106,22 +105,22 @@ class NaydiVeschRepository private constructor(
 
     suspend fun syncWithServer() = withContext(ioDispatcher) {
         val lastSync = getLastSyncTimestamp()
-        val lastDate = if (lastSync > 0) Date(lastSync) else Date(0)
+        val lastTimestamp = lastSync
 
         // 1. Сервер → локальная БД
-        pullFromServer(lastDate)
+        pullFromServer(lastTimestamp)
 
         // 2. Локальные изменения → сервер
-        pushLocalChanges(lastDate)
+        pushLocalChanges(lastTimestamp)
 
         // 3. Запомнить время синхронизации
         setLastSyncTimestamp(System.currentTimeMillis())
     }
 
-    private suspend fun pullFromServer(since: Date) {
+    private suspend fun pullFromServer(since: Long) {
         // Things
         try {
-            api.getThings(updatedSince = since.time)?.forEach { serverThing ->
+            api.getThings(updatedSince = since)?.forEach { serverThing ->
                 val local = thingDao.getByServerId(serverThing.id)
                 if (local == null || serverThing.updatedAt > (local.updatedAt)) {
                     thingDao.insert(
@@ -133,7 +132,7 @@ class NaydiVeschRepository private constructor(
 
         // Locations
         try {
-            api.getLocations(updatedSince = since.time)?.forEach { serverLocation ->
+            api.getLocations(updatedSince = since)?.forEach { serverLocation ->
                 val local = locationDao.getByServerId(serverLocation.id)
                 if (local == null || serverLocation.updatedAt > (local.updatedAt)) {
                     locationDao.insert(
@@ -145,14 +144,14 @@ class NaydiVeschRepository private constructor(
 
         // Links
         try {
-            api.getLinks(updatedSince = since.time)?.forEach { linkResponse ->
+            api.getLinks(updatedSince = since)?.forEach { linkResponse ->
                 val existing = linkDao.getLink(linkResponse.thingId, linkResponse.locationId)
                 if (existing == null) {
                     linkDao.insert(
                         ThingLocationLink(
                                 thingId = linkResponse.thingId,
                                 locationId = linkResponse.locationId,
-                                linkedAt = Date(linkResponse.linkedAt),
+                                linkedAt = linkResponse.linkedAt,
                                 active = linkResponse.active,
                                 serverId = linkResponse.id
                         )
@@ -162,7 +161,7 @@ class NaydiVeschRepository private constructor(
         } catch (e: Exception) { }
     }
 
-    private suspend fun pushLocalChanges(since: Date) {
+    private suspend fun pushLocalChanges(since: Long) {
         thingDao.getModifiedSince(since).forEach { trySyncThingCreate(it); trySyncThingUpdate(it) }
         locationDao.getModifiedSince(since).forEach { trySyncLocationCreate(it); trySyncLocationUpdate(it) }
         linkDao.getModifiedSince(since).forEach { trySyncLinkCreate(it) }
