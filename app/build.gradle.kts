@@ -40,6 +40,14 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
+        freeCompilerArgs += listOf("-Xallow-kapt-language-version-2.0")
+    }
+
+    kapt {
+        correctErrorTypes = true
+        arguments {
+            arg("room.incremental", "false")
+        }
     }
 
     buildFeatures {
