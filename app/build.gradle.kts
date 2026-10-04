@@ -40,11 +40,6 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
-        freeCompilerArgs += listOf("-Xallow-kapt-language-version-2.0")
-    }
-
-    kapt {
-        correctErrorTypes = true
     }
 
     buildFeatures {
@@ -109,7 +104,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     // Room Database
-    val room_version = "2.7.0-alpha02"
+    val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
