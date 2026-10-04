@@ -7,6 +7,7 @@ import com.example.naydivesch.data.api.NaydiVeschApi
 import com.example.naydivesch.data.dao.LocationDao
 import com.example.naydivesch.data.dao.ThingDao
 import com.example.naydivesch.data.dao.ThingLocationLinkDao
+import com.example.naydivesch.data.db.AppDatabaseHelper
 import com.example.naydivesch.model.Location
 import com.example.naydivesch.model.Thing
 import com.example.naydivesch.model.ThingLocationLink
@@ -24,7 +25,7 @@ class NaydiVeschRepository private constructor(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
-    // === Локальные потоки данных (Room) ===
+    // === Локальные потоки данных (SQLite) ===
 
     fun getAllThings(): Flow<List<Thing>> = thingDao.getAll()
 
@@ -196,7 +197,6 @@ class NaydiVeschRepository private constructor(
         if (link.serverId != null) return
         try {
             val response = api.createLink(LinkRequest(link.thingId, link.locationId))
-            // ThingLocationLink is an entity with no id column; use a copy with serverId
             linkDao.update(link.copy(serverId = response.id))
         } catch (e: Exception) { }
     }
@@ -223,13 +223,13 @@ class NaydiVeschRepository private constructor(
         ): NaydiVeschRepository {
             return INSTANCE ?: synchronized(this) {
                 INSTANCE ?: run {
-                    val db = com.example.naydivesch.data.db.AppDatabase.getDatabase(context)
+                    val dbHelper = AppDatabaseHelper.getInstance(context)
                     val prefs = context.getSharedPreferences("naydivesch_prefs", Context.MODE_PRIVATE)
                     val repo = NaydiVeschRepository(
                         api = api,
-                        thingDao = db.thingDao(),
-                        locationDao = db.locationDao(),
-                        linkDao = db.thingLocationLinkDao(),
+                        thingDao = ThingDao(dbHelper),
+                        locationDao = LocationDao(dbHelper),
+                        linkDao = ThingLocationLinkDao(dbHelper),
                         prefs = prefs
                     )
                     INSTANCE = repo
