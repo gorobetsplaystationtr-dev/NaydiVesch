@@ -36,8 +36,8 @@ interface ThingDao {
     suspend fun deleteById(id: Long)
 
     @Query("SELECT * FROM things WHERE updatedAt > :since ORDER BY updatedAt ASC")
-    suspend fun getModifiedSince(since: Date): List<Thing>
+    suspend fun getModifiedSince(since: Long): List<Thing>
 
     @Query("SELECT MAX(updatedAt) FROM things")
-    suspend fun getMaxUpdatedAt(): Date?
+    suspend fun getMaxUpdatedAt(): Long?
 }

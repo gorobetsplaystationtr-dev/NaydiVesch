@@ -36,8 +36,8 @@ interface LocationDao {
     suspend fun deleteById(id: Long)
 
     @Query("SELECT * FROM locations WHERE updatedAt > :since ORDER BY updatedAt ASC")
-    suspend fun getModifiedSince(since: Date): List<Location>
+    suspend fun getModifiedSince(since: Long): List<Location>
 
     @Query("SELECT MAX(updatedAt) FROM locations")
-    suspend fun getMaxUpdatedAt(): Date?
+    suspend fun getMaxUpdatedAt(): Long?
 }

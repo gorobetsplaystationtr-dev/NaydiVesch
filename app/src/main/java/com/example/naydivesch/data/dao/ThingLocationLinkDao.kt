@@ -40,8 +40,8 @@ interface ThingLocationLinkDao {
     suspend fun deactivate(thingId: Long, locationId: Long)
 
     @Query("SELECT * FROM thing_location_links WHERE updatedAt > :since ORDER BY updatedAt ASC")
-    suspend fun getModifiedSince(since: Date): List<ThingLocationLink>
+    suspend fun getModifiedSince(since: Long): List<ThingLocationLink>
 
     @Query("SELECT MAX(updatedAt) FROM thing_location_links")
-    suspend fun getMaxUpdatedAt(): Date?
+    suspend fun getMaxUpdatedAt(): Long?
 }
