@@ -60,7 +60,7 @@ android {
     // Configure release signing config
     signingConfigs {
         create("release") {
-            storeFile = layout.projectDirectory.file("keystore/release.p12")
+            storeFile = layout.projectDirectory.file("keystore/release.p12").asFile
             storeType = "PKCS12"
             keyAlias = "naydivesch"
             storePassword = System.getenv("STORE_PASSWORD") ?: ""
