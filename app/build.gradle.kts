@@ -78,6 +78,9 @@ dependencies {
     // Material Icons Extended for Compose UI
     implementation("androidx.compose.material:material-icons-extended:1.7.0")
 
+    // Material Components (for XML theme)
+    implementation("com.google.android.material:material:1.12.0")
+
     // Core Android / Compose
     implementation(platform("androidx.compose:compose-bom:2024.08.00"))
     implementation("androidx.activity:activity-compose:1.9.2")
