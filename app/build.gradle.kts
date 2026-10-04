@@ -3,7 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("kotlin-android")
-    id("com.google.devtools.ksp") version "2.0.0-1.0.13"
+    id("kotlin-kapt")
 }
 
 android {
@@ -40,6 +40,15 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
+        freeCompilerArgs += listOf("-Xallow-kapt-language-version-2.0")
+    }
+
+    kapt {
+        correctErrorTypes = true
+        arguments {
+            arg("room.incremental", "false")
+            arg("room.generateKotlin", "true")
+        }
     }
 
     buildFeatures {
@@ -109,11 +118,11 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
     implementation("androidx.navigation:navigation-compose:2.8.3")
 
-    // Room Database - Using Room 2.7.0 with KSP for K2 support
-    val room_version = "2.7.0"
+    // Room Database - Room 2.6.1 with kapt for K2 support
+    val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
-    ksp("androidx.room:room-compiler:$room_version")
+    kapt("androidx.room:room-compiler:$room_version")
 
     // Network - Retrofit & OkHttp
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
