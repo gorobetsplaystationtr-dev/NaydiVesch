@@ -82,7 +82,7 @@ jobs:
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          ./gradlew assembleRelease bundleRelease
+          ./gradlew assembleRelease bundleRelease --info
 
       - name: Verify Release APK
         run: |
