@@ -43,7 +43,6 @@ android {
     }
 
     kapt {
-        incremental = false
         correctErrorTypes = true
     }
 
