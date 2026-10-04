@@ -7,7 +7,7 @@ import com.example.naydivesch.data.api.NaydiVeschApi
 import com.example.naydivesch.data.dao.LocationDao
 import com.example.naydivesch.data.dao.ThingDao
 import com.example.naydivesch.data.dao.ThingLocationLinkDao
-import com.example.naydivesch.data.db.AppDatabaseHelper
+import com.example.naydivesch.data.db.AppDatabase
 import com.example.naydivesch.model.Location
 import com.example.naydivesch.model.Thing
 import com.example.naydivesch.model.ThingLocationLink
@@ -15,6 +15,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import java.util.Date
 
 class NaydiVeschRepository private constructor(
     private val api: NaydiVeschApi,
@@ -25,7 +26,7 @@ class NaydiVeschRepository private constructor(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
-    // === Локальные потоки данных (SQLite) ===
+    // === Локальные потоки данных (Room) ===
 
     fun getAllThings(): Flow<List<Thing>> = thingDao.getAll()
 
@@ -105,22 +106,22 @@ class NaydiVeschRepository private constructor(
 
     suspend fun syncWithServer() = withContext(ioDispatcher) {
         val lastSync = getLastSyncTimestamp()
-        val lastTimestamp = lastSync
+        val lastDate = if (lastSync > 0) Date(lastSync) else Date(0)
 
         // 1. Сервер → локальная БД
-        pullFromServer(lastTimestamp)
+        pullFromServer(lastDate)
 
         // 2. Локальные изменения → сервер
-        pushLocalChanges(lastTimestamp)
+        pushLocalChanges(lastDate)
 
         // 3. Запомнить время синхронизации
         setLastSyncTimestamp(System.currentTimeMillis())
     }
 
-    private suspend fun pullFromServer(since: Long) {
+    private suspend fun pullFromServer(since: Date) {
         // Things
         try {
-            api.getThings(updatedSince = since)?.forEach { serverThing ->
+            api.getThings(updatedSince = since.time)?.forEach { serverThing ->
                 val local = thingDao.getByServerId(serverThing.id)
                 if (local == null || serverThing.updatedAt > (local.updatedAt)) {
                     thingDao.insert(
@@ -132,7 +133,7 @@ class NaydiVeschRepository private constructor(
 
         // Locations
         try {
-            api.getLocations(updatedSince = since)?.forEach { serverLocation ->
+            api.getLocations(updatedSince = since.time)?.forEach { serverLocation ->
                 val local = locationDao.getByServerId(serverLocation.id)
                 if (local == null || serverLocation.updatedAt > (local.updatedAt)) {
                     locationDao.insert(
@@ -144,14 +145,14 @@ class NaydiVeschRepository private constructor(
 
         // Links
         try {
-            api.getLinks(updatedSince = since)?.forEach { linkResponse ->
+            api.getLinks(updatedSince = since.time)?.forEach { linkResponse ->
                 val existing = linkDao.getLink(linkResponse.thingId, linkResponse.locationId)
                 if (existing == null) {
                     linkDao.insert(
                         ThingLocationLink(
                                 thingId = linkResponse.thingId,
                                 locationId = linkResponse.locationId,
-                                linkedAt = linkResponse.linkedAt,
+                                linkedAt = Date(linkResponse.linkedAt),
                                 active = linkResponse.active,
                                 serverId = linkResponse.id
                         )
@@ -161,7 +162,7 @@ class NaydiVeschRepository private constructor(
         } catch (e: Exception) { }
     }
 
-    private suspend fun pushLocalChanges(since: Long) {
+    private suspend fun pushLocalChanges(since: Date) {
         thingDao.getModifiedSince(since).forEach { trySyncThingCreate(it); trySyncThingUpdate(it) }
         locationDao.getModifiedSince(since).forEach { trySyncLocationCreate(it); trySyncLocationUpdate(it) }
         linkDao.getModifiedSince(since).forEach { trySyncLinkCreate(it) }
@@ -223,13 +224,13 @@ class NaydiVeschRepository private constructor(
         ): NaydiVeschRepository {
             return INSTANCE ?: synchronized(this) {
                 INSTANCE ?: run {
-                    val dbHelper = AppDatabaseHelper.getInstance(context)
+                    val db = AppDatabase.getDatabase(context)
                     val prefs = context.getSharedPreferences("naydivesch_prefs", Context.MODE_PRIVATE)
                     val repo = NaydiVeschRepository(
                         api = api,
-                        thingDao = ThingDao(dbHelper),
-                        locationDao = LocationDao(dbHelper),
-                        linkDao = ThingLocationLinkDao(dbHelper),
+                        thingDao = db.thingDao(),
+                        locationDao = db.locationDao(),
+                        linkDao = db.thingLocationLinkDao(),
                         prefs = prefs
                     )
                     INSTANCE = repo
