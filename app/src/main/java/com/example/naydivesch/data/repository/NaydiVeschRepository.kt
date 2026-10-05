@@ -1,4 +1,4 @@
-package com.example.naydivesch.data.network
+package com.example.naydivesch.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -7,7 +7,7 @@ import com.example.naydivesch.data.api.NaydiVeschApi
 import com.example.naydivesch.data.dao.LocationDao
 import com.example.naydivesch.data.dao.ThingDao
 import com.example.naydivesch.data.dao.ThingLocationLinkDao
-import com.example.naydivesch.data.db.AppDatabase
+import com.example.naydivesch.data.db.AppDatabaseHelper
 import com.example.naydivesch.model.Location
 import com.example.naydivesch.model.Thing
 import com.example.naydivesch.model.ThingLocationLink
@@ -223,13 +223,13 @@ class NaydiVeschRepository private constructor(
         ): NaydiVeschRepository {
             return INSTANCE ?: synchronized(this) {
                 INSTANCE ?: run {
-                    val db = AppDatabase.getDatabase(context)
+                    val dbHelper = AppDatabaseHelper.getInstance(context)
                     val prefs = context.getSharedPreferences("naydivesch_prefs", Context.MODE_PRIVATE)
                     val repo = NaydiVeschRepository(
                         api = api,
-                        thingDao = db.thingDao(),
-                        locationDao = db.locationDao(),
-                        linkDao = db.thingLocationLinkDao(),
+                        thingDao = ThingDao(dbHelper),
+                        locationDao = LocationDao(dbHelper),
+                        linkDao = ThingLocationLinkDao(dbHelper),
                         prefs = prefs
                     )
                     INSTANCE = repo

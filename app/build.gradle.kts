@@ -100,6 +100,9 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
+    // Image loading (Coil)
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
     // Data / Storage
     implementation("androidx.datastore:datastore-preferences:1.1.2")
     implementation("androidx.datastore:datastore-core:1.1.2")
