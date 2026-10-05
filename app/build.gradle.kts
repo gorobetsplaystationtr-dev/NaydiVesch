@@ -1,9 +1,7 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.android") version "1.9.24"
     id("kotlin-android")
-    id("com.google.devtools.ksp") version "2.0.0-1.0.14"
 }
 
 android {
@@ -42,20 +40,12 @@ android {
         jvmTarget = "17"
     }
 
-    kapt {
-        correctErrorTypes = true
-        arguments {
-            arg("room.incremental", "false")
-        }
-    }
-
     buildFeatures {
         compose = true
     }
 
     composeOptions {
-        // Kotlin 2.0.0: Compose Compiler is bundled with the Kotlin Gradle plugin
-        // Remove kotlinCompilerExtensionVersion as it's deprecated
+        kotlinCompilerExtensionVersion = "1.5.6"
     }
 
     packagingOptions {
@@ -101,26 +91,8 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.6")
 
     // Kotlin
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.24")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
-
-    // Core Android / Compose
-    implementation(platform("androidx.compose:compose-bom:2024.08.00"))
-    implementation("androidx.activity:activity-compose:1.9.2")
-    implementation("androidx.compose.ui:ui:1.7.0")
-    implementation("androidx.compose.ui:ui-graphics:1.7.0")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.7.0")
-    implementation("androidx.compose.material3:material3:1.3.0")
-    implementation("androidx.compose.material3:material3-window-size-class:1.3.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
-    implementation("androidx.navigation:navigation-compose:2.8.3")
-
-    // Room Database - Room 2.7.0 with KSP for K2 support
-    val room_version = "2.7.0"
-    implementation("androidx.room:room-runtime:$room_version")
-    implementation("androidx.room:room-ktx:$room_version")
-    ksp("androidx.room:room-compiler:$room_version")
 
     // Network - Retrofit & OkHttp
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
@@ -133,17 +105,17 @@ dependencies {
     implementation("androidx.datastore:datastore-core:1.1.2")
 
     // Lifecycle & ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
 
     // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.08.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.0")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.7.0")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.0")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.01.00"))
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.5")
+    debugImplementation("androidx.compose.ui:ui-tooling:1.6.5")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.5")
 }
