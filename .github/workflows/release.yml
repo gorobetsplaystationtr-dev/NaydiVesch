@@ -1,5 +1,9 @@
 name: Release - Signed APK + AAB
 
+concurrency:
+  group: release-build
+  cancel-in-progress: true
+
 on:
   push:
     tags: ['v*']
