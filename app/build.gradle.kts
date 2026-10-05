@@ -1,6 +1,6 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android") version "1.9.24"
+    id("org.jetbrains.kotlin.android") version "1.9.21"
     id("kotlin-android")
 }
 
@@ -91,7 +91,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.6")
 
     // Kotlin
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.24")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.21")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 
     // Network - Retrofit & OkHttp
