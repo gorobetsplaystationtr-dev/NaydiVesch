@@ -1,5 +1,9 @@
 name: CI - Debug Build
 
+concurrency:
+  group: ci-debug-build
+  cancel-in-progress: true
+
 on:
   push:
     branches: [main]
