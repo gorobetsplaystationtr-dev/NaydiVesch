@@ -8,6 +8,7 @@ import com.example.naydivesch.model.Location
 import com.example.naydivesch.model.Thing
 import com.example.naydivesch.model.ThingLocationLink
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.withContext
@@ -20,7 +21,7 @@ class ThingLocationLinkDao(private val dbHelper: AppDatabaseHelper) {
             locationId = cursor.getLong(cursor.getColumnIndexOrThrow("locationId")),
             linkedAt = cursor.getLong(cursor.getColumnIndexOrThrow("linkedAt")),
             active = cursor.getInt(cursor.getColumnIndexOrThrow("active")) == 1,
-            serverId = cursor.getLong(cursor.getColumnIndexOrThrow("serverId")).takeIf { it != 0 }
+            serverId = cursor.getLong(cursor.getColumnIndexOrThrow("serverId")).takeIf { it != 0L }
         )
     }
 
@@ -95,8 +96,9 @@ class ThingLocationLinkDao(private val dbHelper: AppDatabaseHelper) {
             put("active", if (link.active) 1 else 0)
             link.serverId?.let { put("serverId", it) }
         }
-        db.insertWithOnConflict("thing_location_links", null, values, SQLiteDatabase.CONFLICT_REPLACE)
+        val id = db.insertWithOnConflict("thing_location_links", null, values, SQLiteDatabase.CONFLICT_REPLACE)
         db.close()
+        id
     }
 
     suspend fun update(link: ThingLocationLink) = withContext(Dispatchers.IO) {

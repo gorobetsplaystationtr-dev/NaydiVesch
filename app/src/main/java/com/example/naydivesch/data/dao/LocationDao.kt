@@ -6,13 +6,14 @@ import android.database.sqlite.SQLiteDatabase
 import com.example.naydivesch.data.db.AppDatabaseHelper
 import com.example.naydivesch.model.Location
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.withContext
 
 class LocationDao(private val dbHelper: AppDatabaseHelper) {
 
-    private fun cursorToLocation(cursor: Cursor): Location {
+    fun cursorToLocation(cursor: Cursor): Location {
         return Location(
             id = cursor.getLong(cursor.getColumnIndexOrThrow("id")),
             name = cursor.getString(cursor.getColumnIndexOrThrow("name")),
@@ -21,7 +22,7 @@ class LocationDao(private val dbHelper: AppDatabaseHelper) {
             qrCodeUrl = cursor.getString(cursor.getColumnIndexOrThrow("qrCodeUrl")),
             createdAt = cursor.getLong(cursor.getColumnIndexOrThrow("createdAt")),
             updatedAt = cursor.getLong(cursor.getColumnIndexOrThrow("updatedAt")),
-            serverId = cursor.getLong(cursor.getColumnIndexOrThrow("serverId")).takeIf { it != 0 }
+            serverId = cursor.getLong(cursor.getColumnIndexOrThrow("serverId")).takeIf { it != 0L }
         )
     }
 

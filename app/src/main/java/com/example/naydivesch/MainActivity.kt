@@ -45,6 +45,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun NaydiVeschApp() {
     val context = LocalContext.current

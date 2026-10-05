@@ -65,20 +65,7 @@ interface NaydiVeschApi {
         @Query("thing_id") thingId: Long,
         @Query("location_id") locationId: Long
     )
-}
 
-data class LinkRequest(
-    val thingId: Long,
-    val locationId: Long
-)
-
-data class LinkResponse(
-    val id: Long,
-    val thingId: Long,
-    val locationId: Long,
-    val linkedAt: Long,
-    val active: Boolean
-) {
     companion object {
         private const val BASE_URL = "http://192.168.2.12:8080/api/"
 
@@ -103,3 +90,16 @@ data class LinkResponse(
             }
     }
 }
+
+data class LinkRequest(
+    val thingId: Long,
+    val locationId: Long
+)
+
+data class LinkResponse(
+    val id: Long,
+    val thingId: Long,
+    val locationId: Long,
+    val linkedAt: Long,
+    val active: Boolean
+)
