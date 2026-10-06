@@ -171,7 +171,7 @@ private fun AddLocationDialog(
                     onValueChange = { qrCodeUrl = it },
                     label = { Text("QR-код URL") },
                     singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Url)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri)
                 )
             }
         },
